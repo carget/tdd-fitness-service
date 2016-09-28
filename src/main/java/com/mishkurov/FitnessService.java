@@ -6,12 +6,12 @@ package com.mishkurov;
 public class FitnessService {
     private double drinkTotal;
     private double caloriesTotal;
-    private double distanceTotal;
+    private double secondsTotal;
 
     public FitnessService() {
         drinkTotal = 0;
         caloriesTotal = 0;
-        distanceTotal = 0;
+        secondsTotal = 0;
     }
 
     public void drink(Double amount) {
@@ -30,11 +30,11 @@ public class FitnessService {
         return caloriesTotal;
     }
 
-    public void walk(double distance) {
-        distanceTotal += distance;
+    public void move(double seconds) {
+        secondsTotal += seconds;
     }
 
-    public double getDistanceAmount() {
-        return distanceTotal;
+    public double getSecondsAmount() {
+        return secondsTotal;
     }
 }
