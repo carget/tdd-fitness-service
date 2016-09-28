@@ -52,9 +52,10 @@ public class FitnessServiceTest {
     @Test
     public void move() {
         int seconds = 3600;
-        service.move(seconds);
-        service.move(seconds);
-        assertThat(service.getSecondsAmount(), is(seconds * 2));
+        service.move(LocalDate.parse("2016-09-27"), seconds);
+        service.move(LocalDate.parse("2016-09-27"), seconds);
+        assertThat(service.getMoveSecondsAmount(LocalDate.parse("2016-09-27")), is(seconds * 2));
+        assertThat(service.getMoveSecondsAmount(LocalDate.parse("2016-09-25")), is(seconds * 0));
     }
 
     @Test
@@ -77,14 +78,16 @@ public class FitnessServiceTest {
     public void drinkLeft() {
         double drink = 220.32;
         service.drink(LocalDate.parse("2016-09-28"), drink);
-        assertThat(service.getDrinkLeft(LocalDate.parse("2016-09-28")), closeTo(DRINK_PER_DAY - drink, EPSILON));
+        service.drink(LocalDate.parse("2016-09-28"), drink);
+        assertThat(service.getDrinkLeft(LocalDate.parse("2016-09-28")), closeTo(DRINK_PER_DAY - drink * 2, EPSILON));
+        assertThat(service.getDrinkLeft(LocalDate.parse("2016-09-27")), closeTo(DRINK_PER_DAY - drink * 0, EPSILON));
     }
 
     @Test
     public void moveLeft() {
         int seconds = 3600;
-        service.move(seconds);
-        assertThat(service.getMoveLeft(), is(MOVE_SECONDS_PER_DAY - seconds));
+        service.move(LocalDate.parse("2016-09-27"), seconds);
+        assertThat(service.getMoveSecondsLeft(LocalDate.parse("2016-09-27")), is(MOVE_SECONDS_PER_DAY - seconds));
     }
 
     @Test
