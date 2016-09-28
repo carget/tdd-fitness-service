@@ -10,13 +10,13 @@ public class FitnessService {
     public static final int MOVE_SECONDS_PER_DAY = 7200;
     public static final double CALORIES_PER_DAY = 2300.;
     private Map<LocalDate, Double> drinkTotal;
-    private double caloriesTotal;
+    private Map<LocalDate, Double> caloriesTotal;
     private int secondsTotal;
     private int pacesTotal;
 
     public FitnessService() {
         drinkTotal = new HashMap<>();
-        caloriesTotal = 0;
+        caloriesTotal = new HashMap<>();
         secondsTotal = 0;
         pacesTotal = 0;
     }
@@ -32,12 +32,15 @@ public class FitnessService {
         return drinkAmount == null ? 0. : drinkAmount;
     }
 
-    public void eat(Double calories) {
-        caloriesTotal += calories;
+    public void eat(LocalDate date, Double calories) {
+        Double consumedCalories = caloriesTotal.get(date);
+        consumedCalories = consumedCalories == null ? 0 : consumedCalories;
+        caloriesTotal.put(date, consumedCalories + calories);
     }
 
-    public Double getCaloriesAmount() {
-        return caloriesTotal;
+    public Double getCaloriesAmount(LocalDate date) {
+        Double caloriesAmount = caloriesTotal.get(date);
+        return caloriesAmount == null ? 0 : caloriesAmount;
     }
 
     public void move(double seconds) {
@@ -61,15 +64,19 @@ public class FitnessService {
     }
 
     public double getDrinkLeft(LocalDate date) {
-        return DRINK_PER_DAY - drinkTotal.get(date);
+        Double consumedDrink = drinkTotal.get(date);
+        consumedDrink = consumedDrink == null ? 0 : consumedDrink;
+        return DRINK_PER_DAY - consumedDrink;
     }
 
     public int getMoveLeft() {
         return MOVE_SECONDS_PER_DAY - secondsTotal;
     }
 
-    public double getCaloriesLeft() {
-        return CALORIES_PER_DAY - caloriesTotal;
+    public double getCaloriesLeft(LocalDate date) {
+        Double consumedCalories = caloriesTotal.get(date);
+        consumedCalories = consumedCalories == null ? 0 : consumedCalories;
+        return CALORIES_PER_DAY - consumedCalories;
     }
 
 

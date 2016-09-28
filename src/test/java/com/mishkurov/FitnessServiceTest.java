@@ -1,6 +1,5 @@
 package com.mishkurov;
 
-import org.hamcrest.number.IsCloseTo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,9 +41,12 @@ public class FitnessServiceTest {
     @Test
     public void eat() {
         Double calories = 15.;
-        service.eat(calories);
-        service.eat(calories);
-        assertThat(service.getCaloriesAmount(), is(calories * 2));
+        service.eat(LocalDate.parse("2016-09-27"), calories);
+        service.eat(LocalDate.parse("2016-09-25"), calories);
+        service.eat(LocalDate.parse("2016-09-25"), calories);
+        service.eat(LocalDate.parse("2016-09-27"), calories);
+        assertThat(service.getCaloriesAmount(LocalDate.parse("2016-09-25")), closeTo(calories * 2, EPSILON));
+        assertThat(service.getCaloriesAmount(LocalDate.parse("2016-09-27")), closeTo(calories * 2, EPSILON));
     }
 
     @Test
@@ -88,7 +90,11 @@ public class FitnessServiceTest {
     @Test
     public void eatLeft() {
         double calories = 254.3;
-        service.eat(calories);
-        assertThat(service.getCaloriesLeft(), closeTo(CALORIES_PER_DAY - calories, EPSILON));
+        service.eat(LocalDate.parse("2016-09-27"), calories);
+        service.eat(LocalDate.parse("2016-09-27"), calories);
+        service.eat(LocalDate.parse("2016-09-26"), calories);
+        assertThat(service.getCaloriesLeft(LocalDate.parse("2016-09-27")), closeTo(CALORIES_PER_DAY - calories * 2, EPSILON));
+        assertThat(service.getCaloriesLeft(LocalDate.parse("2016-09-26")), closeTo(CALORIES_PER_DAY - calories * 1, EPSILON));
+        assertThat(service.getCaloriesLeft(LocalDate.parse("2016-09-25")), closeTo(CALORIES_PER_DAY - calories * 0, EPSILON));
     }
 }
