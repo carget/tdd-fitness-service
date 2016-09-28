@@ -28,14 +28,25 @@ public class FitnessServiceTest {
     public void drink() {
         Double amount = 100.;
         service.drink(amount);
-        assertThat(service.getDrinkAmount(), is(100.));
+        service.drink(amount);
+        assertThat(service.getDrinkAmount(), is(200.));
     }
 
     @Test
     public void eat() {
         Double calories=15.;
         service.eat(calories);
-        assertThat(service.getCaloriesAmount(), is(15.));
+        service.eat(calories);
+        assertThat(service.getCaloriesAmount(), is(30.));
     }
+
+    @Test
+    public void walk(){
+        double distance=1.33;
+        service.walk(distance);
+        service.walk(distance);
+        assertThat(service.getDistanceAmount(), is(2.66));
+    }
+
 
 }
