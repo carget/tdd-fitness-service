@@ -1,5 +1,6 @@
 package com.mishkurov;
 
+import org.hamcrest.number.IsCloseTo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,10 +9,12 @@ import java.time.LocalDate;
 
 import static com.mishkurov.FitnessService.*;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.closeTo;
 import static org.junit.Assert.*;
 
 public class FitnessServiceTest {
 
+    public static final double EPSILON = 1E-6;
     private FitnessService service;
 
     @Before
@@ -31,9 +34,9 @@ public class FitnessServiceTest {
         service.drink(LocalDate.parse("2016-09-28"), amount);
         service.drink(LocalDate.parse("2016-09-28"), amount);
         service.drink(LocalDate.parse("2016-09-29"), amount);
-        assertThat(service.getDrinkAmount(LocalDate.parse("2016-09-28")), is(amount * 2.));
-        assertThat(service.getDrinkAmount(LocalDate.parse("2016-09-27")), is(amount * 1.));
-        assertThat(service.getDrinkAmount(LocalDate.parse("2016-09-26")), is(amount * 0.));
+        assertThat(service.getDrinkAmount(LocalDate.parse("2016-09-28")), closeTo(amount * 2., EPSILON));
+        assertThat(service.getDrinkAmount(LocalDate.parse("2016-09-27")), closeTo(amount * 1., EPSILON));
+        assertThat(service.getDrinkAmount(LocalDate.parse("2016-09-26")), closeTo(amount * 0., EPSILON));
     }
 
     @Test
@@ -72,7 +75,7 @@ public class FitnessServiceTest {
     public void drinkLeft() {
         double drink = 220.32;
         service.drink(LocalDate.parse("2016-09-28"), drink);
-        assertThat(service.getDrinkLeft(LocalDate.parse("2016-09-28")), is(DRINK_PER_DAY - drink));
+        assertThat(service.getDrinkLeft(LocalDate.parse("2016-09-28")), closeTo(DRINK_PER_DAY - drink, EPSILON));
     }
 
     @Test
@@ -86,6 +89,6 @@ public class FitnessServiceTest {
     public void eatLeft() {
         double calories = 254.3;
         service.eat(calories);
-        assertThat(service.getCaloriesLeft(), is(CALORIES_PER_DAY - calories));
+        assertThat(service.getCaloriesLeft(), closeTo(CALORIES_PER_DAY - calories, EPSILON));
     }
 }
