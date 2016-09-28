@@ -12,13 +12,13 @@ public class FitnessService {
     private Map<LocalDate, Double> drinkTotal;
     private Map<LocalDate, Double> caloriesTotal;
     private Map<LocalDate, Integer> moveSecondsTotal;
-    private int pacesTotal;
+    private Map<LocalDate, Integer> pacesTotal;
 
     public FitnessService() {
         drinkTotal = new HashMap<>();
         caloriesTotal = new HashMap<>();
         moveSecondsTotal = new HashMap<>();
-        pacesTotal = 0;
+        pacesTotal = new HashMap<>();
     }
 
     public void drink(LocalDate date, Double amount) {
@@ -55,16 +55,21 @@ public class FitnessService {
         return moveSecondAmount;
     }
 
-    public void pace(int paces) {
-        pacesTotal += paces;
+    public void pace(LocalDate date, int paces) {
+        Integer pacesRecorded = pacesTotal.get(date);
+        pacesRecorded = pacesRecorded == null ? 0 : pacesRecorded;
+        pacesTotal.put(date, pacesRecorded + paces);
     }
 
-    public int getPacesAmount() {
-        return pacesTotal;
+    public int getPacesAmount(LocalDate date) {
+        Integer pacesAmount = pacesTotal.get(date);
+        return pacesAmount == null ? 0 : pacesAmount;
     }
 
-    public int getPacesLeft() {
-        return PACES_PER_DAY - pacesTotal;
+    public int getPacesLeft(LocalDate date) {
+        Integer pacesRecorded = pacesTotal.get(date);
+        pacesRecorded = pacesRecorded == null ? 0 : pacesRecorded;
+        return PACES_PER_DAY - pacesRecorded;
     }
 
     public double getDrinkLeft(LocalDate date) {

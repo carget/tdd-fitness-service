@@ -61,17 +61,19 @@ public class FitnessServiceTest {
     @Test
     public void pace() {
         int paces = 1234;
-        service.pace(paces);
-        service.pace(paces);
-        service.pace(paces);
-        assertThat(service.getPacesAmount(), is(paces * 3));
+        service.pace(LocalDate.parse("2016-09-27"), paces);
+        service.pace(LocalDate.parse("2016-09-27"), paces);
+        service.pace(LocalDate.parse("2016-09-27"), paces);
+        assertThat(service.getPacesAmount(LocalDate.parse("2016-09-27")), is(paces * 3));
+        assertThat(service.getPacesAmount(LocalDate.parse("2016-09-26")), is(paces * 0));
     }
 
     @Test
     public void pacesLeft() {
         int paces = 1234;
-        service.pace(paces);
-        assertThat(service.getPacesLeft(), is(PACES_PER_DAY - paces));
+        service.pace(LocalDate.parse("2016-09-27"), paces);
+        assertThat(service.getPacesLeft(LocalDate.parse("2016-09-27")), is(PACES_PER_DAY - paces));
+        assertThat(service.getPacesLeft(LocalDate.parse("2016-09-26")), is(PACES_PER_DAY));
     }
 
     @Test
