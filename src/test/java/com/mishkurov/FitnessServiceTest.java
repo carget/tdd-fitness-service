@@ -45,6 +45,14 @@ public class FitnessServiceTest {
         assertThat(service.getSecondsAmount(), is(7200.));
     }
 
+    @Test
+    public void pace() {
+        int paces = 1234;
+        service.pace(paces);
+        service.pace(paces);
+        service.pace(paces);
+        assertThat(service.getPacesAmount(), is(1234*3));
+    }
 
 
 }

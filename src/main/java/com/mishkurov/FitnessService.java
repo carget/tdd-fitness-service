@@ -4,11 +4,13 @@ public class FitnessService {
     private double drinkTotal;
     private double caloriesTotal;
     private double secondsTotal;
+    private int pacesTotal;
 
     public FitnessService() {
         drinkTotal = 0;
         caloriesTotal = 0;
         secondsTotal = 0;
+        pacesTotal = 0;
     }
 
     public void drink(Double amount) {
@@ -33,5 +35,13 @@ public class FitnessService {
 
     public double getSecondsAmount() {
         return secondsTotal;
+    }
+
+    public void pace(int paces) {
+        pacesTotal += paces;
+    }
+
+    public int getPacesAmount() {
+        return pacesTotal;
     }
 }
