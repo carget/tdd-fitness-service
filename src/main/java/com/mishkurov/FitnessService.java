@@ -1,8 +1,5 @@
 package com.mishkurov;
 
-/**
- * @author Anton_Mishkurov
- */
 public class FitnessService {
     private double drinkTotal;
     private double caloriesTotal;

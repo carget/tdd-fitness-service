@@ -7,9 +7,6 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
-/**
- * @author Anton_Mishkurov
- */
 public class FitnessServiceTest {
 
     private FitnessService service;
