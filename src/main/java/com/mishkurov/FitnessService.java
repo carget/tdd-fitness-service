@@ -91,4 +91,127 @@ public class FitnessService {
     }
 
 
+    public Report getReport(LocalDate reportDate) {
+        StringBuilder report = new StringBuilder("Report\n");
+//        for () {
+//        }
+//
+        return null;
+    }
+
+    public static class Report {
+        private double eatPercent;
+        private double drinkPercent;
+        private double movePercent;
+        private double pacePercent;
+        private double eatMedian;
+        private double drinkMedian;
+        private double moveMedian;
+        private double paceMedian;
+        private LocalDate startDate;
+        private LocalDate endDate;
+
+        public Report(LocalDate startDate, LocalDate endDate) {
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.eatPercent = 0;
+            this.drinkPercent = 0;
+            this.movePercent = 0;
+            this.pacePercent = 0;
+            this.eatMedian = 0;
+            this.drinkMedian = 0;
+            this.moveMedian = 0;
+            this.paceMedian = 0;
+        }
+
+        public LocalDate getStartDate() {
+            return startDate;
+        }
+
+        public LocalDate getEndDate() {
+            return endDate;
+        }
+
+        public void setActivityPercent(Activity activity, double percent) {
+            switch (activity) {
+                case EAT:
+                    this.eatPercent = percent;
+                    break;
+                case DRINK:
+                    this.drinkPercent = percent;
+                    break;
+                case MOVE:
+                    this.movePercent = percent;
+                    break;
+                case PACE:
+                    this.pacePercent = percent;
+                    break;
+            }
+        }
+
+        public double getActivityPercent(Activity activity) {
+            switch (activity) {
+                case EAT:
+                    return this.eatPercent;
+                case DRINK:
+                    return this.drinkPercent;
+                case MOVE:
+                    return this.movePercent;
+                case PACE:
+                    return this.pacePercent;
+                default:
+                    return 0;
+            }
+        }
+
+        public void setMedian(Activity activity, double median) {
+            switch (activity) {
+                case EAT:
+                    this.eatMedian = median;
+                    break;
+                case DRINK:
+                    this.drinkMedian = median;
+                    break;
+                case MOVE:
+                    this.moveMedian = median;
+                    break;
+                case PACE:
+                    this.paceMedian = median;
+                    break;
+            }
+        }
+
+        public double getMedian(Activity activity) {
+            switch (activity) {
+                case EAT:
+                    return this.eatMedian;
+                case DRINK:
+                    return this.drinkMedian;
+                case MOVE:
+                    return this.moveMedian;
+                case PACE:
+                    return this.paceMedian;
+                default:
+                    return 0;
+            }
+        }
+
+        @Override
+        public boolean equals(Object otherReport) {
+            if (otherReport instanceof Report) {
+                //todo replace with double comparison
+                return (((Report) otherReport).eatPercent == this.eatPercent &&
+                        ((Report) otherReport).drinkPercent == this.drinkPercent &&
+                        ((Report) otherReport).movePercent == this.movePercent &&
+                        ((Report) otherReport).pacePercent == this.pacePercent &&
+                        ((Report) otherReport).eatMedian == this.eatMedian &&
+                        ((Report) otherReport).drinkMedian == this.drinkMedian &&
+                        ((Report) otherReport).moveMedian == this.moveMedian &&
+                        ((Report) otherReport).paceMedian == this.paceMedian);
+            } else {
+                return false;
+            }
+        }
+    }
 }
+

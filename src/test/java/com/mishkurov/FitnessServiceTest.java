@@ -2,6 +2,7 @@ package com.mishkurov;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -102,4 +103,23 @@ public class FitnessServiceTest {
         assertThat(service.getCaloriesLeft(LocalDate.parse("2016-09-26")), closeTo(CALORIES_PER_DAY - calories * 1, EPSILON));
         assertThat(service.getCaloriesLeft(LocalDate.parse("2016-09-25")), closeTo(CALORIES_PER_DAY - calories * 0, EPSILON));
     }
+
+    @Test
+    @Ignore
+    public void reportPerDay() {
+        LocalDate reportDate = LocalDate.parse("2016-09-27");
+        FitnessService.Report serviceReport = service.getReport(reportDate);
+        FitnessService.Report idealReport = new FitnessService.Report(reportDate, reportDate) {{
+                setActivityPercent(Activity.EAT, 10.);
+                setActivityPercent(Activity.DRINK, 10.);
+                setActivityPercent(Activity.PACE, 10.);
+                setActivityPercent(Activity.MOVE, 10.);
+                setMedian(Activity.EAT, 10.);
+                setMedian(Activity.DRINK, 10.);
+                setMedian(Activity.PACE, 10.);
+                setMedian(Activity.MOVE, 10.);
+            }};
+        assertThat(idealReport, is(idealReport));
+    }
+
 }
