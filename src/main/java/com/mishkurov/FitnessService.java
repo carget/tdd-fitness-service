@@ -5,91 +5,92 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FitnessService {
-    public static final int PACES_PER_DAY = 2000;
+    public static final double PACES_PER_DAY = 2000;
     public static final double DRINK_PER_DAY = 1500.;
-    public static final int MOVE_SECONDS_PER_DAY = 7200;
+    public static final double MOVE_SECONDS_PER_DAY = 7200;
     public static final double CALORIES_PER_DAY = 2300.;
-    private Map<LocalDate, Double> drinkTotal;
-    private Map<LocalDate, Double> caloriesTotal;
-    private Map<LocalDate, Integer> moveSecondsTotal;
-    private Map<LocalDate, Integer> pacesTotal;
+    private Map<LocalDate, Map<Activity, Double>> allData;
 
     public FitnessService() {
-        drinkTotal = new HashMap<>();
-        caloriesTotal = new HashMap<>();
-        moveSecondsTotal = new HashMap<>();
-        pacesTotal = new HashMap<>();
+        allData = new HashMap<>();
     }
 
-    public void drink(LocalDate date, Double amount) {
-        Double storedAmount = drinkTotal.get(date);
+    public void addAmount(LocalDate date, Activity activity, Double amount) {
+        Map<Activity, Double> activityData = allData.get(date);
+        if (activityData == null) {
+            activityData = new HashMap<>();
+            allData.put(date, activityData);
+        }
+        Double storedAmount = activityData.get(activity);
         storedAmount = storedAmount == null ? 0 : storedAmount;
-        drinkTotal.put(date, storedAmount + amount);
+        activityData.put(activity, storedAmount + amount);
     }
 
-    public Double getDrinkAmount(LocalDate date) {
-        Double drinkAmount = drinkTotal.get(date);
-        return drinkAmount == null ? 0. : drinkAmount;
+    public double getAmount(LocalDate date, Activity activity) {
+        Map<Activity, Double> activityData = allData.get(date);
+        if (activityData == null) {
+            activityData = new HashMap<>();
+            allData.put(date, activityData);
+        }
+        Double storedAmount = activityData.get(activity);
+        return storedAmount == null ? 0 : storedAmount;
     }
 
+    @Deprecated
+    public void drink(LocalDate date, Double amount) {
+        addAmount(date, Activity.DRINK, amount);
+    }
+
+    public double getDrinkAmount(LocalDate date) {
+        return getAmount(date, Activity.DRINK);
+    }
+
+    @Deprecated
     public void eat(LocalDate date, Double calories) {
-        Double consumedCalories = caloriesTotal.get(date);
-        consumedCalories = consumedCalories == null ? 0 : consumedCalories;
-        caloriesTotal.put(date, consumedCalories + calories);
+        addAmount(date, Activity.EAT, calories);
     }
 
-    public Double getCaloriesAmount(LocalDate date) {
-        Double caloriesAmount = caloriesTotal.get(date);
-        return caloriesAmount == null ? 0 : caloriesAmount;
+    public Double getEatAmount(LocalDate date) {
+        return getAmount(date, Activity.EAT);
     }
 
-    public void move(LocalDate date, int seconds) {
-        Integer moveSecondsRecorded = moveSecondsTotal.get(date);
-        moveSecondsRecorded = moveSecondsRecorded == null ? 0 : moveSecondsRecorded;
-        moveSecondsTotal.put(date, moveSecondsRecorded + seconds);
+    @Deprecated
+    public void move(LocalDate date, double seconds) {
+        addAmount(date, Activity.MOVE,  seconds);
     }
 
-    public int getMoveSecondsAmount(LocalDate date) {
-        Integer moveSecondAmount = moveSecondsTotal.get(date);
-        moveSecondAmount = moveSecondAmount == null ? 0 : moveSecondAmount;
-        return moveSecondAmount;
+    public double getMoveSecondsAmount(LocalDate date) {
+        return getAmount(date, Activity.MOVE);
     }
 
-    public void pace(LocalDate date, int paces) {
-        Integer pacesRecorded = pacesTotal.get(date);
-        pacesRecorded = pacesRecorded == null ? 0 : pacesRecorded;
-        pacesTotal.put(date, pacesRecorded + paces);
+    @Deprecated
+    public void pace(LocalDate date, double paces) {
+        addAmount(date, Activity.PACE, paces);
     }
 
-    public int getPacesAmount(LocalDate date) {
-        Integer pacesAmount = pacesTotal.get(date);
-        return pacesAmount == null ? 0 : pacesAmount;
+    public double getPacesAmount(LocalDate date) {
+        return getAmount(date, Activity.PACE);
     }
 
-    public int getPacesLeft(LocalDate date) {
-        Integer pacesRecorded = pacesTotal.get(date);
-        pacesRecorded = pacesRecorded == null ? 0 : pacesRecorded;
+    public double getPacesLeft(LocalDate date) {
+        double pacesRecorded = getPacesAmount(date);
         return PACES_PER_DAY - pacesRecorded;
     }
 
     public double getDrinkLeft(LocalDate date) {
-        Double consumedDrink = drinkTotal.get(date);
-        consumedDrink = consumedDrink == null ? 0 : consumedDrink;
+        double consumedDrink = getDrinkAmount(date);
         return DRINK_PER_DAY - consumedDrink;
     }
 
-    public int getMoveSecondsLeft(LocalDate date) {
-        Integer moveSecondsRecorded = moveSecondsTotal.get(date);
-        moveSecondsRecorded = moveSecondsRecorded == null ? 0 : moveSecondsRecorded;
+    public double getMoveSecondsLeft(LocalDate date) {
+        double moveSecondsRecorded = getMoveSecondsAmount(date);
         return MOVE_SECONDS_PER_DAY - moveSecondsRecorded;
     }
 
     public double getCaloriesLeft(LocalDate date) {
-        Double consumedCalories = caloriesTotal.get(date);
-        consumedCalories = consumedCalories == null ? 0 : consumedCalories;
+        double consumedCalories = getEatAmount(date);
         return CALORIES_PER_DAY - consumedCalories;
     }
-
 
     public Report getReport(LocalDate reportDate) {
         StringBuilder report = new StringBuilder("Report\n");

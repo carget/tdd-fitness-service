@@ -28,15 +28,29 @@ public class FitnessServiceTest {
     }
 
     @Test
+    public void addAmount() {
+        Double amount = 100.;
+        service.addAmount(LocalDate.parse("2016-09-27"), Activity.DRINK, amount);
+        service.addAmount(LocalDate.parse("2016-09-27"), Activity.EAT, amount * 2);
+        service.addAmount(LocalDate.parse("2016-09-26"), Activity.MOVE, amount * 3);
+        service.addAmount(LocalDate.parse("2016-09-26"), Activity.MOVE, amount * 3);
+        assertThat(service.getAmount(LocalDate.parse("2016-09-27"), Activity.DRINK), closeTo(amount * 1., EPSILON));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-26"), Activity.MOVE), closeTo(amount * 6., EPSILON));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-27"), Activity.MOVE), closeTo(amount * 0., EPSILON));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-27"), Activity.EAT), closeTo(amount * 2., EPSILON));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-27"), Activity.PACE), closeTo(amount * 0., EPSILON));
+    }
+
+    @Test
     public void drink() {
         Double amount = 100.;
         service.drink(LocalDate.parse("2016-09-27"), amount);
         service.drink(LocalDate.parse("2016-09-28"), amount);
         service.drink(LocalDate.parse("2016-09-28"), amount);
         service.drink(LocalDate.parse("2016-09-29"), amount);
-        assertThat(service.getDrinkAmount(LocalDate.parse("2016-09-28")), closeTo(amount * 2., EPSILON));
-        assertThat(service.getDrinkAmount(LocalDate.parse("2016-09-27")), closeTo(amount * 1., EPSILON));
-        assertThat(service.getDrinkAmount(LocalDate.parse("2016-09-26")), closeTo(amount * 0., EPSILON));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-28"),Activity.DRINK), closeTo(amount * 2., EPSILON));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-27"),Activity.DRINK), closeTo(amount * 1., EPSILON));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-26"),Activity.DRINK), closeTo(amount * 0., EPSILON));
     }
 
     @Test
@@ -46,32 +60,32 @@ public class FitnessServiceTest {
         service.eat(LocalDate.parse("2016-09-25"), calories);
         service.eat(LocalDate.parse("2016-09-25"), calories);
         service.eat(LocalDate.parse("2016-09-27"), calories);
-        assertThat(service.getCaloriesAmount(LocalDate.parse("2016-09-25")), closeTo(calories * 2, EPSILON));
-        assertThat(service.getCaloriesAmount(LocalDate.parse("2016-09-27")), closeTo(calories * 2, EPSILON));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-25"),Activity.EAT), closeTo(calories * 2, EPSILON));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-27"),Activity.EAT), closeTo(calories * 2, EPSILON));
     }
 
     @Test
     public void move() {
-        int seconds = 3600;
+        double seconds = 3600;
         service.move(LocalDate.parse("2016-09-27"), seconds);
         service.move(LocalDate.parse("2016-09-27"), seconds);
-        assertThat(service.getMoveSecondsAmount(LocalDate.parse("2016-09-27")), is(seconds * 2));
-        assertThat(service.getMoveSecondsAmount(LocalDate.parse("2016-09-25")), is(seconds * 0));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-27"),Activity.MOVE), is(seconds * 2.));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-25"),Activity.MOVE), is(seconds * 0.));
     }
 
     @Test
     public void pace() {
-        int paces = 1234;
+        double paces = 1234;
         service.pace(LocalDate.parse("2016-09-27"), paces);
         service.pace(LocalDate.parse("2016-09-27"), paces);
         service.pace(LocalDate.parse("2016-09-27"), paces);
-        assertThat(service.getPacesAmount(LocalDate.parse("2016-09-27")), is(paces * 3));
-        assertThat(service.getPacesAmount(LocalDate.parse("2016-09-26")), is(paces * 0));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-27"),Activity.PACE), is(paces * 3));
+        assertThat(service.getAmount(LocalDate.parse("2016-09-22"),Activity.PACE), is(paces * 0));
     }
 
     @Test
     public void pacesLeft() {
-        int paces = 1234;
+        double paces = 1234;
         service.pace(LocalDate.parse("2016-09-27"), paces);
         assertThat(service.getPacesLeft(LocalDate.parse("2016-09-27")), is(PACES_PER_DAY - paces));
         assertThat(service.getPacesLeft(LocalDate.parse("2016-09-26")), is(PACES_PER_DAY));
@@ -88,7 +102,7 @@ public class FitnessServiceTest {
 
     @Test
     public void moveLeft() {
-        int seconds = 3600;
+        double seconds = 3600;
         service.move(LocalDate.parse("2016-09-27"), seconds);
         assertThat(service.getMoveSecondsLeft(LocalDate.parse("2016-09-27")), is(MOVE_SECONDS_PER_DAY - seconds));
     }
@@ -110,15 +124,15 @@ public class FitnessServiceTest {
         LocalDate reportDate = LocalDate.parse("2016-09-27");
         FitnessService.Report serviceReport = service.getReport(reportDate);
         FitnessService.Report idealReport = new FitnessService.Report(reportDate, reportDate) {{
-                setActivityPercent(Activity.EAT, 10.);
-                setActivityPercent(Activity.DRINK, 10.);
-                setActivityPercent(Activity.PACE, 10.);
-                setActivityPercent(Activity.MOVE, 10.);
-                setMedian(Activity.EAT, 10.);
-                setMedian(Activity.DRINK, 10.);
-                setMedian(Activity.PACE, 10.);
-                setMedian(Activity.MOVE, 10.);
-            }};
+            setActivityPercent(Activity.EAT, 10.);
+            setActivityPercent(Activity.DRINK, 10.);
+            setActivityPercent(Activity.PACE, 10.);
+            setActivityPercent(Activity.MOVE, 10.);
+            setMedian(Activity.EAT, 10.);
+            setMedian(Activity.DRINK, 10.);
+            setMedian(Activity.PACE, 10.);
+            setMedian(Activity.MOVE, 10.);
+        }};
         assertThat(idealReport, is(idealReport));
     }
 
