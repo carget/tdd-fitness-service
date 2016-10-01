@@ -86,8 +86,20 @@ public class FitnessServiceTest {
     public void pacesLeft() {
         double paces = 1234;
         service.addAmount(LocalDate.parse("2016-09-27"), Activity.PACE, paces);
-        assertThat(service.getPacesLeft(LocalDate.parse("2016-09-27")), is(PACES_PER_DAY - paces));
-        assertThat(service.getPacesLeft(LocalDate.parse("2016-09-26")), is(PACES_PER_DAY));
+        assertThat(service.getPacesLeft(LocalDate.parse("2016-09-27")),
+                is(service.getProfile().getActivityGoal(Activity.PACE) - paces));
+        assertThat(service.getPacesLeft(LocalDate.parse("2016-09-26")),
+                is(service.getProfile().getActivityGoal(Activity.PACE)));
+    }
+
+    @Test
+    public void pacesLeftProfile() {
+        double paces = 1234;
+        service.addAmount(LocalDate.parse("2016-09-27"), Activity.PACE, paces);
+        assertThat(service.getAmountLeft(LocalDate.parse("2016-09-27"), Activity.PACE),
+                is(service.getProfile().getActivityGoal(Activity.PACE) - paces));
+        assertThat(service.getPacesLeft(LocalDate.parse("2016-09-26")),
+                is(service.getProfile().getActivityGoal(Activity.PACE)));
     }
 
     @Test
@@ -95,15 +107,18 @@ public class FitnessServiceTest {
         double drink = 220.32;
         service.addAmount(LocalDate.parse("2016-09-28"), Activity.DRINK, drink);
         service.addAmount(LocalDate.parse("2016-09-28"), Activity.DRINK, drink);
-        assertThat(service.getDrinkLeft(LocalDate.parse("2016-09-28")), closeTo(DRINK_PER_DAY - drink * 2, EPSILON));
-        assertThat(service.getDrinkLeft(LocalDate.parse("2016-09-27")), closeTo(DRINK_PER_DAY - drink * 0, EPSILON));
+        assertThat(service.getDrinkLeft(LocalDate.parse("2016-09-28")),
+                closeTo(service.getProfile().getActivityGoal(Activity.DRINK) - drink * 2, EPSILON));
+        assertThat(service.getDrinkLeft(LocalDate.parse("2016-09-27")),
+                closeTo(service.getProfile().getActivityGoal(Activity.DRINK) - drink * 0, EPSILON));
     }
 
     @Test
     public void moveLeft() {
         double seconds = 3600;
         service.addAmount(LocalDate.parse("2016-09-27"), Activity.MOVE, seconds);
-        assertThat(service.getMoveSecondsLeft(LocalDate.parse("2016-09-27")), is(MOVE_SECONDS_PER_DAY - seconds));
+        assertThat(service.getMoveSecondsLeft(LocalDate.parse("2016-09-27")),
+                is(service.getProfile().getActivityGoal(Activity.MOVE) - seconds));
     }
 
     @Test
@@ -112,9 +127,12 @@ public class FitnessServiceTest {
         service.addAmount(LocalDate.parse("2016-09-27"), Activity.EAT, calories);
         service.addAmount(LocalDate.parse("2016-09-27"), Activity.EAT, calories);
         service.addAmount(LocalDate.parse("2016-09-26"), Activity.EAT, calories);
-        assertThat(service.getCaloriesLeft(LocalDate.parse("2016-09-27")), closeTo(CALORIES_PER_DAY - calories * 2, EPSILON));
-        assertThat(service.getCaloriesLeft(LocalDate.parse("2016-09-26")), closeTo(CALORIES_PER_DAY - calories * 1, EPSILON));
-        assertThat(service.getCaloriesLeft(LocalDate.parse("2016-09-25")), closeTo(CALORIES_PER_DAY - calories * 0, EPSILON));
+        assertThat(service.getCaloriesLeft(LocalDate.parse("2016-09-27")),
+                closeTo(service.getProfile().getActivityGoal(Activity.EAT) - calories * 2, EPSILON));
+        assertThat(service.getCaloriesLeft(LocalDate.parse("2016-09-26")),
+                closeTo(service.getProfile().getActivityGoal(Activity.EAT) - calories * 1, EPSILON));
+        assertThat(service.getCaloriesLeft(LocalDate.parse("2016-09-25")),
+                closeTo(service.getProfile().getActivityGoal(Activity.EAT) - calories * 0, EPSILON));
     }
 
     @Test

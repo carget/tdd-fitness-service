@@ -4,15 +4,19 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class FitnessService {
-    public static final double CALORIES_PER_DAY = 1000;
-    public static final double PACES_PER_DAY = 1000.;
-    public static final double DRINK_PER_DAY = 1000;
-    public static final double MOVE_SECONDS_PER_DAY = 1000;
+
     public static final double EPSILON = 1E-6;
+
+    private Profile profile;
     private Map<LocalDate, Map<Activity, Double>> allData;
 
     public FitnessService() {
         allData = new HashMap<>();
+        profile = new Profile();
+    }
+
+    public Profile getProfile() {
+        return profile;
     }
 
     public void addAmount(LocalDate date, Activity activity, Double amount) {
@@ -36,6 +40,10 @@ public class FitnessService {
         return storedAmount == null ? 0 : storedAmount;
     }
 
+    public double getAmountLeft(LocalDate date, Activity activity) {
+        return profile.getActivityGoal(activity) - allData.get(date).get(activity);
+    }
+
     public double getDrinkAmount(LocalDate date) {
         return getAmount(date, Activity.DRINK);
     }
@@ -53,34 +61,23 @@ public class FitnessService {
     }
 
     public double getPacesLeft(LocalDate date) {
-        return PACES_PER_DAY - getPacesAmount(date);
+        return profile.getActivityGoal(Activity.PACE) - getPacesAmount(date);
     }
 
     public double getDrinkLeft(LocalDate date) {
-        return DRINK_PER_DAY - getDrinkAmount(date);
+        return profile.getActivityGoal(Activity.DRINK) - getDrinkAmount(date);
     }
 
     public double getMoveSecondsLeft(LocalDate date) {
-        return MOVE_SECONDS_PER_DAY - getMoveSecondsAmount(date);
+        return profile.getActivityGoal(Activity.MOVE) - getMoveSecondsAmount(date);
     }
 
     public double getCaloriesLeft(LocalDate date) {
-        return CALORIES_PER_DAY - getEatAmount(date);
+        return profile.getActivityGoal(Activity.EAT) - getEatAmount(date);
     }
 
     public double getPercentForActivity(Activity activity, double value) {
-        switch (activity) {
-            case EAT:
-                return value / CALORIES_PER_DAY * 100.;
-            case DRINK:
-                return value / DRINK_PER_DAY * 100.;
-            case MOVE:
-                return value / MOVE_SECONDS_PER_DAY * 100.;
-            case PACE:
-                return value / PACES_PER_DAY * 100.;
-            default:
-                return 0;
-        }
+        return value / profile.getActivityGoal(activity) * 100;
     }
 
     public Report getReport(LocalDate startDate, LocalDate endDate) {
