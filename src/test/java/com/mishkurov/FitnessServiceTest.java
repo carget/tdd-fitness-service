@@ -120,29 +120,60 @@ public class FitnessServiceTest {
     @Test
     public void reportPerDay() {
         LocalDate reportDate = LocalDate.parse("2016-09-27");
-        for (int i = 0; i++ < 10; ) {
-            service.addAmount(reportDate, Activity.EAT, i * 1.);  //45
-            service.addAmount(reportDate, Activity.DRINK, i * 10.); //450
-            service.addAmount(reportDate, Activity.PACE, i * 100.); //4500
-            service.addAmount(reportDate, Activity.MOVE, 100.); //1000
-        }
+        service.addAmount(reportDate, Activity.EAT, 10.);
+        service.addAmount(reportDate, Activity.DRINK, 100.);
+        service.addAmount(reportDate, Activity.MOVE, 1000.);
+        service.addAmount(reportDate, Activity.PACE, 10000.);
         FitnessService.Report serviceReport = service.getReport(reportDate, reportDate);
-        FitnessService.Report idealReport =  service.new Report(reportDate, reportDate) {{
-//            setActivityPercent(Activity.EAT, 45 / CALORIES_PER_DAY * 100);
-//            setActivityPercent(Activity.DRINK, 450 / DRINK_PER_DAY * 100);
-//            setActivityPercent(Activity.PACE, 4500 / PACES_PER_DAY * 100);
-//            setActivityPercent(Activity.MOVE, 1000 / MOVE_SECONDS_PER_DAY * 100);
-            setMedian(Activity.EAT, 4.5);
-            setMedian(Activity.DRINK, 45);
-            setMedian(Activity.PACE, 450.);
-            setMedian(Activity.MOVE, 100.);
-        }};
-        System.out.println("service Report");
-        System.out.println(serviceReport);
-        System.out.println("ideal Report");
-        System.out.println(idealReport);
+        FitnessService.Report idealReport = service.new Report(reportDate, reportDate);
+        idealReport.setActivityPercent(Activity.EAT, 1);
+        idealReport.setActivityPercent(Activity.DRINK, 10);
+        idealReport.setActivityPercent(Activity.MOVE, 100);
+        idealReport.setActivityPercent(Activity.PACE, 1000);
+        idealReport.setMedian(Activity.EAT, 1);
+        idealReport.setMedian(Activity.DRINK, 10);
+        idealReport.setMedian(Activity.MOVE, 100);
+        idealReport.setMedian(Activity.PACE, 1000);
         assertThat(serviceReport, is(idealReport));
     }
+
+    @Test
+    public void reportPer3Day() {
+        LocalDate startDate = LocalDate.parse("2016-09-27");
+        LocalDate currDate = startDate.plusDays(0);
+        service.addAmount(currDate, Activity.EAT, 1.);
+        service.addAmount(currDate, Activity.DRINK, 10.);
+        service.addAmount(currDate, Activity.PACE, 100.);
+        service.addAmount(currDate, Activity.MOVE, 13.);
+        currDate = LocalDate.parse("2016-09-28");
+        service.addAmount(currDate, Activity.EAT, 2.);
+        service.addAmount(currDate, Activity.DRINK, 10.);
+        service.addAmount(currDate, Activity.PACE, 200.);
+        service.addAmount(currDate, Activity.MOVE, 5.);
+        currDate = LocalDate.parse("2016-09-29");
+        service.addAmount(currDate, Activity.EAT, 3.);
+        service.addAmount(currDate, Activity.DRINK, 20.);
+        service.addAmount(currDate, Activity.PACE, 100.);
+        service.addAmount(currDate, Activity.MOVE, 20.);
+        currDate = LocalDate.parse("2016-09-30");
+        service.addAmount(currDate, Activity.EAT, 4.);
+        service.addAmount(currDate, Activity.DRINK, 20.);
+        service.addAmount(currDate, Activity.PACE, 100.);
+        service.addAmount(currDate, Activity.MOVE, 20.);
+        LocalDate endDate = LocalDate.parse("2016-09-30");
+        FitnessService.Report serviceReport = service.getReport(startDate, endDate);
+        FitnessService.Report idealReport = service.new Report(startDate, endDate);
+        idealReport.setActivityPercent(Activity.EAT, .25);
+        idealReport.setActivityPercent(Activity.DRINK, 1.5);
+        idealReport.setActivityPercent(Activity.MOVE, 1.45);
+        idealReport.setActivityPercent(Activity.PACE, 12.5);
+        idealReport.setMedian(Activity.EAT, .25);
+        idealReport.setMedian(Activity.DRINK, 1.5);
+        idealReport.setMedian(Activity.PACE, 10.);
+        idealReport.setMedian(Activity.MOVE, 1.65);
+        assertThat(serviceReport, is(idealReport));
+    }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void testStartEndDatesValues() {
@@ -150,6 +181,5 @@ public class FitnessServiceTest {
         LocalDate endDate = LocalDate.parse("2016-09-26");
         FitnessService.Report report = service.getReport(startDate, endDate);
     }
-
 
 }

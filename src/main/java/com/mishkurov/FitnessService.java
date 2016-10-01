@@ -4,10 +4,10 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class FitnessService {
-    public static final double PACES_PER_DAY = 2000;
-    public static final double DRINK_PER_DAY = 1500.;
-    public static final double MOVE_SECONDS_PER_DAY = 7200;
-    public static final double CALORIES_PER_DAY = 2300.;
+    public static final double CALORIES_PER_DAY = 1000;
+    public static final double PACES_PER_DAY = 1000.;
+    public static final double DRINK_PER_DAY = 1000;
+    public static final double MOVE_SECONDS_PER_DAY = 1000;
     public static final double EPSILON = 1E-6;
     private Map<LocalDate, Map<Activity, Double>> allData;
 
@@ -40,7 +40,7 @@ public class FitnessService {
         return getAmount(date, Activity.DRINK);
     }
 
-    public Double getEatAmount(LocalDate date) {
+    public double getEatAmount(LocalDate date) {
         return getAmount(date, Activity.EAT);
     }
 
@@ -53,35 +53,31 @@ public class FitnessService {
     }
 
     public double getPacesLeft(LocalDate date) {
-        double pacesRecorded = getPacesAmount(date);
-        return PACES_PER_DAY - pacesRecorded;
+        return PACES_PER_DAY - getPacesAmount(date);
     }
 
     public double getDrinkLeft(LocalDate date) {
-        double consumedDrink = getDrinkAmount(date);
-        return DRINK_PER_DAY - consumedDrink;
+        return DRINK_PER_DAY - getDrinkAmount(date);
     }
 
     public double getMoveSecondsLeft(LocalDate date) {
-        double moveSecondsRecorded = getMoveSecondsAmount(date);
-        return MOVE_SECONDS_PER_DAY - moveSecondsRecorded;
+        return MOVE_SECONDS_PER_DAY - getMoveSecondsAmount(date);
     }
 
     public double getCaloriesLeft(LocalDate date) {
-        double consumedCalories = getEatAmount(date);
-        return CALORIES_PER_DAY - consumedCalories;
+        return CALORIES_PER_DAY - getEatAmount(date);
     }
 
-    public double getPercentForActivity(LocalDate date, Activity activity) {
+    public double getPercentForActivity(Activity activity, double value) {
         switch (activity) {
             case EAT:
-                return (allData.get(date).get(activity) / CALORIES_PER_DAY) * 100.;
+                return value / CALORIES_PER_DAY * 100.;
             case DRINK:
-                return (allData.get(date).get(activity) / DRINK_PER_DAY) * 100.;
+                return value / DRINK_PER_DAY * 100.;
             case MOVE:
-                return (allData.get(date).get(activity) / MOVE_SECONDS_PER_DAY) * 100.;
+                return value / MOVE_SECONDS_PER_DAY * 100.;
             case PACE:
-                return (allData.get(date).get(activity) / PACES_PER_DAY) * 100.;
+                return value / PACES_PER_DAY * 100.;
             default:
                 return 0;
         }
@@ -92,14 +88,6 @@ public class FitnessService {
     }
 
     public class Report {
-        private double eatPercent;
-        private double drinkPercent;
-        private double movePercent;
-        private double pacePercent;
-        private double eatMedian;
-        private double drinkMedian;
-        private double moveMedian;
-        private double paceMedian;
         private Map<Activity, Double> activityPercentMap;
         private Map<Activity, Double> activityMedianMap;
         private LocalDate startDate;
@@ -113,14 +101,6 @@ public class FitnessService {
             this.endDate = endDate;
             activityPercentMap = new HashMap<>();
             activityMedianMap = new HashMap<>();
-            this.eatPercent = 0;
-            this.drinkPercent = 0;
-            this.movePercent = 0;
-            this.pacePercent = 0;
-            this.eatMedian = 0;
-            this.drinkMedian = 0;
-            this.moveMedian = 0;
-            this.paceMedian = 0;
             calculate();
         }
 
@@ -131,105 +111,80 @@ public class FitnessService {
                 percentsPerDay.put(a, new ArrayList<>());
             }
             while (!currDate.isAfter(endDate)) {
-                Map<Activity, Double> dataPerDay = allData.get(currDate);
                 for (Activity a : Activity.values()) {
-                    Double valueForActivity = dataPerDay.get(a);
+                    Double valueForActivity = allData.get(currDate).get(a);
                     valueForActivity = valueForActivity == null ? 0 : valueForActivity;
-                    percentsPerDay.get(a).add(valueForActivity);
+                    percentsPerDay.get(a).add(getPercentForActivity(a, valueForActivity));
                 }
                 currDate = currDate.plusDays(1);
             }
             for (Activity a : Activity.values()) {
                 ArrayList<Double> activityValues = percentsPerDay.get(a);
                 Collections.sort(activityValues);
-                Double median = 0.;
-                int numberOfValues = activityValues.size();
-                if (numberOfValues % 2 == 0) {
-                    median = (activityValues.get(numberOfValues / 2) + activityValues.get(numberOfValues / 2 + 1)) / 2;
-                } else {
-                    median = activityValues.get(numberOfValues / 2);
-                }
-                activityMedianMap.put(a, median);
+                activityMedianMap.put(a, calcMedian(activityValues));
+                activityPercentMap.put(a, calcAvg(activityValues));
+            }
+        }
 
-//                activityPercentMap.put(a, activityValues)
+        private double calcAvg(List<Double> list) {
+            if (list.size() == 0) return 0;
+            Double sum = 0.;
+            for (Double v : list) {
+                sum += v;
+            }
+            return sum / list.size();
+        }
+
+        private double calcMedian(List<Double> list) {
+            if (list.size() == 0) return 0;
+            if (list.size() == 1) return list.get(0);
+            int listSize = list.size();
+            if (listSize % 2 == 0) {
+                return (list.get(listSize / 2 - 1) + list.get(listSize / 2)) / 2;
+            } else {
+                return list.get(listSize / 2);
             }
         }
 
         public void setActivityPercent(Activity activity, double percent) {
-            switch (activity) {
-                case EAT:
-                    this.eatPercent = percent;
-                    break;
-                case DRINK:
-                    this.drinkPercent = percent;
-                    break;
-                case MOVE:
-                    this.movePercent = percent;
-                    break;
-                case PACE:
-                    this.pacePercent = percent;
-                    break;
-            }
+            activityPercentMap.put(activity, percent);
         }
 
         public double getActivityPercent(Activity activity) {
-            switch (activity) {
-                case EAT:
-                    return this.eatPercent;
-                case DRINK:
-                    return this.drinkPercent;
-                case MOVE:
-                    return this.movePercent;
-                case PACE:
-                    return this.pacePercent;
-                default:
-                    return 0;
-            }
+            return activityPercentMap.get(activity);
         }
 
         public void setMedian(Activity activity, double median) {
-            switch (activity) {
-                case EAT:
-                    this.eatMedian = median;
-                    break;
-                case DRINK:
-                    this.drinkMedian = median;
-                    break;
-                case MOVE:
-                    this.moveMedian = median;
-                    break;
-                case PACE:
-                    this.paceMedian = median;
-                    break;
-            }
+            activityMedianMap.put(activity, median);
         }
 
         public double getMedian(Activity activity) {
-            switch (activity) {
-                case EAT:
-                    return this.eatMedian;
-                case DRINK:
-                    return this.drinkMedian;
-                case MOVE:
-                    return this.moveMedian;
-                case PACE:
-                    return this.paceMedian;
-                default:
-                    return 0;
-            }
+            return activityMedianMap.get(activity);
+        }
+
+        public LocalDate getStartDate() {
+            return startDate;
+        }
+
+        public LocalDate getEndDate() {
+            return endDate;
         }
 
         @Override
         public boolean equals(Object otherReport) {
             if (otherReport instanceof Report) {
-                return (Math.abs(Double.compare(((Report) otherReport).eatPercent, this.eatPercent)) < EPSILON &&
-                        Math.abs(Double.compare(((Report) otherReport).drinkPercent, this.drinkPercent)) < EPSILON &&
-                        Math.abs(Double.compare(((Report) otherReport).movePercent, this.movePercent)) < EPSILON &&
-                        Math.abs(Double.compare(((Report) otherReport).pacePercent, this.pacePercent)) < EPSILON &&
-                        Math.abs(Double.compare(((Report) otherReport).eatMedian, this.eatMedian)) < EPSILON &&
-                        Math.abs(Double.compare(((Report) otherReport).drinkMedian, this.drinkMedian)) < EPSILON &&
-                        Math.abs(Double.compare(((Report) otherReport).moveMedian, this.moveMedian)) < EPSILON &&
-                        Math.abs(Double.compare(((Report) otherReport).paceMedian, this.paceMedian)) < EPSILON);
+                if (!(((Report) otherReport).getStartDate().isEqual(this.getStartDate()) &&
+                        ((Report) otherReport).getEndDate().isEqual(this.getEndDate()))) {
+                    return false;
+                }
+                for (Activity a : Activity.values()) {
+                    if (!(Math.abs(Double.compare(((Report) otherReport).getActivityPercent(a),
+                            this.getActivityPercent(a))) < EPSILON &&
+                            Math.abs(Double.compare(((Report) otherReport).getMedian(a), this.getMedian(a))) < EPSILON)) {
+                        return false;
+                    }
+                }
+                return true;
             } else {
                 return false;
             }
@@ -241,7 +196,7 @@ public class FitnessService {
             report.append("Start date: " + this.startDate + " End date: " + this.endDate + "\n");
             for (Activity a : Activity.values()) {
                 report.append("Percent for (" + a + ")=" + activityPercentMap.get(a) + ", ");
-                report.append("Median for (" + a + ")=" + activityMedianMap.get(a) + ", ");
+                report.append("Median for (" + a + ")=" + activityMedianMap.get(a) + ", \n");
             }
             return report.toString();
         }
