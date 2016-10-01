@@ -42,52 +42,13 @@ public class FitnessService {
 
     public double getAmountLeft(LocalDate date, Activity activity) {
         Map<Activity, Double> activityPerDay = allData.get(date);
+        double activityGoal = profile.getActivityGoal(activity);
         if (activityPerDay == null) {
-            return profile.getActivityGoal(activity);
+            return activityGoal;
         }
         Double amountLeft = activityPerDay.get(activity);
         amountLeft = amountLeft == null ? 0 : amountLeft;
-        return profile.getActivityGoal(activity) - amountLeft;
-    }
-
-    @Deprecated
-    public double getDrinkAmount(LocalDate date) {
-        return getAmount(date, Activity.DRINK);
-    }
-
-    @Deprecated
-    public double getEatAmount(LocalDate date) {
-        return getAmount(date, Activity.EAT);
-    }
-
-    @Deprecated
-    public double getMoveSecondsAmount(LocalDate date) {
-        return getAmount(date, Activity.MOVE);
-    }
-
-    @Deprecated
-    public double getPacesAmount(LocalDate date) {
-        return getAmount(date, Activity.PACE);
-    }
-
-    @Deprecated
-    public double getPacesLeft(LocalDate date) {
-        return profile.getActivityGoal(Activity.PACE) - getPacesAmount(date);
-    }
-
-    @Deprecated
-    public double getDrinkLeft(LocalDate date) {
-        return profile.getActivityGoal(Activity.DRINK) - getDrinkAmount(date);
-    }
-
-    @Deprecated
-    public double getMoveSecondsLeft(LocalDate date) {
-        return profile.getActivityGoal(Activity.MOVE) - getMoveSecondsAmount(date);
-    }
-
-    @Deprecated
-    public double getCaloriesLeft(LocalDate date) {
-        return profile.getActivityGoal(Activity.EAT) - getEatAmount(date);
+        return activityGoal - amountLeft;
     }
 
     public double getPercentForActivity(Activity activity, double value) {
