@@ -2,7 +2,6 @@ package com.mishkurov;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -18,7 +17,7 @@ public class FitnessServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new FitnessService();
+        service = new SimpleFitnessService();
     }
 
     @After
@@ -142,8 +141,8 @@ public class FitnessServiceTest {
         service.addAmount(reportDate, Activity.DRINK, 100.);
         service.addAmount(reportDate, Activity.MOVE, 1000.);
         service.addAmount(reportDate, Activity.PACE, 10000.);
-        FitnessService.Report serviceReport = service.getReport(reportDate, reportDate);
-        FitnessService.Report idealReport = service.new Report(reportDate, reportDate);
+        SimpleFitnessService.Report serviceReport = service.getReport(reportDate, reportDate);
+        SimpleFitnessService.Report idealReport = service.getReport(reportDate, reportDate);
         idealReport.setActivityPercent(Activity.EAT, 1);
         idealReport.setActivityPercent(Activity.DRINK, 10);
         idealReport.setActivityPercent(Activity.MOVE, 100);
@@ -179,8 +178,8 @@ public class FitnessServiceTest {
         service.addAmount(currDate, Activity.PACE, 100.);
         service.addAmount(currDate, Activity.MOVE, 20.);
         LocalDate endDate = LocalDate.parse("2016-09-30");
-        FitnessService.Report serviceReport = service.getReport(startDate, endDate);
-        FitnessService.Report idealReport = service.new Report(startDate, endDate);
+        SimpleFitnessService.Report serviceReport = service.getReport(startDate, endDate);
+        SimpleFitnessService.Report idealReport = service.getReport(startDate, endDate);
         idealReport.setActivityPercent(Activity.EAT, .25);
         idealReport.setActivityPercent(Activity.DRINK, 1.5);
         idealReport.setActivityPercent(Activity.MOVE, 1.45);
@@ -197,7 +196,7 @@ public class FitnessServiceTest {
     public void testStartEndDatesValues() {
         LocalDate startDate = LocalDate.parse("2016-09-27");
         LocalDate endDate = LocalDate.parse("2016-09-26");
-        FitnessService.Report report = service.getReport(startDate, endDate);
+        SimpleFitnessService.Report report = service.getReport(startDate, endDate);
     }
 
 }
